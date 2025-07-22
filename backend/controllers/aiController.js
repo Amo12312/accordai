@@ -1,5 +1,9 @@
 require('dotenv').config();
 
+// Gemini API configuration
+const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const API_KEY = 'AIzaSyBRhGw0lcagRIgwauI1ZXESO--kYjL88_Q';
+
 // AI API handler with both Gemini and backup
 const handleAIRequest = async (req, res) => {
   try {
@@ -19,7 +23,7 @@ const handleAIRequest = async (req, res) => {
     // Try Gemini API first
     while (retryCount < maxRetries) {
       try {
-        response = await fetch(`${process.env.GEMINI_API_URL}?key=${process.env.GEMINI_API_KEY}`, {
+        response = await fetch(`${API_URL}?key=${API_KEY}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -76,7 +76,11 @@ function App() {
     }
 
     try {
-      await sendMessage(message);
+      // Get the auth token from localStorage
+      const userToken = localStorage.getItem('authToken');
+      
+      // Call sendMessage with proper parameters
+      await sendMessage(message, isAnonymous, userToken || undefined);
       
       // Update trial status for anonymous users
       if (isAnonymous) {
@@ -180,7 +184,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700">
       {/* Trial Banner for anonymous users */}
       {isAnonymous && trialStatus && (
         <TrialBanner
@@ -192,8 +196,8 @@ function App() {
 
       {/* Success Message */}
       {authSuccess && (
-        <div className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-bounce">
-          ✅ Successfully logged in! Welcome to Accord GPT!
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg fade-in">
+          ✅ Successfully logged in! Welcome to Accord AI!
         </div>
       )}
 
@@ -214,61 +218,93 @@ function App() {
         />
       )}
 
-      <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-screen max-w-5xl mx-auto">
         {/* Header */}
-        <ChatHeader 
-          user={user}
-          onSignOut={signOut}
-          onSignInClick={() => setShowAuthModal(true)}
-        />
+        <div className="glass-dark rounded-b-2xl mx-4 mt-4 shadow-xl">
+          <ChatHeader 
+            user={user}
+            onSignOut={signOut}
+            onSignInClick={() => setShowAuthModal(true)}
+          />
+        </div>
         
         {/* Main Chat Area */}
-        <div className="flex-1 relative overflow-hidden">
-          <div className="absolute inset-0 overflow-y-auto px-4 pb-32">
-            {error && (
-              <div className="mb-4 p-4 bg-red-100 border border-red-300 rounded-lg text-red-700 shadow-md">
-                ⚠️ {error}
-              </div>
-            )}
-            {messages.map((message, index) => (
-              <ChatMessage
-                key={message.id}
-                message={message}
-                isTyping={isLoading && index === messages.length - 1 && message.role === 'assistant'}
-                onAssistantSpoken={index === messages.length - 1 && message.role === 'assistant' ? handleAssistantSpoken : undefined}
-                isSpeaking={isSpeaking && index === messages.length - 1 && message.role === 'assistant'}
-              />
-            ))}
-            {showLoadingMessage && <LoadingMessage />}
-            <div ref={messagesEndRef} />
+        <div className="flex-1 relative overflow-hidden mx-4 my-6">
+          <div className="glass rounded-2xl h-full relative shadow-2xl">
+            <div className="absolute inset-0 overflow-y-auto p-6 pb-32">
+              {error && (
+                <div className="mb-6 p-4 bg-red-100/90 backdrop-blur border border-red-300 rounded-xl text-red-700 shadow-lg slide-up">
+                  <div className="flex items-center">
+                    <span className="text-xl mr-3">⚠️</span>
+                    <span className="font-medium">{error}</span>
+                  </div>
+                </div>
+              )}
+              
+              {messages.length === 0 && !isLoading && (
+                <div className="text-center py-16 fade-in">
+                  <div className="text-7xl mb-6">🤖</div>
+                  <h2 className="text-3xl font-bold text-gray-700 mb-3">Welcome to Accord AI</h2>
+                  <p className="text-gray-600 text-lg max-w-md mx-auto">Your intelligent AI assistant is ready to help. Start a conversation by typing a message below.</p>
+                  <div className="mt-8 flex flex-wrap justify-center gap-2">
+                    <span className="px-3 py-1 bg-white/20 rounded-full text-sm text-gray-600">💡 Ask anything</span>
+                    <span className="px-3 py-1 bg-white/20 rounded-full text-sm text-gray-600">🎨 Creative writing</span>
+                    <span className="px-3 py-1 bg-white/20 rounded-full text-sm text-gray-600">🔍 Research</span>
+                    <span className="px-3 py-1 bg-white/20 rounded-full text-sm text-gray-600">💻 Coding help</span>
+                  </div>
+                </div>
+              )}
+              
+              {messages.map((message, index) => (
+                <div key={message.id} className="fade-in">
+                  <ChatMessage
+                    message={message}
+                    isTyping={isLoading && index === messages.length - 1 && message.role === 'assistant'}
+                    onAssistantSpoken={index === messages.length - 1 && message.role === 'assistant' ? handleAssistantSpoken : undefined}
+                    isSpeaking={isSpeaking && index === messages.length - 1 && message.role === 'assistant'}
+                  />
+                </div>
+              ))}
+              {showLoadingMessage && (
+                <div className="slide-up">
+                  <LoadingMessage />
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
           </div>
         </div>
         
         {/* Floating Input Area */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white/95 to-transparent pt-20 pb-4">
-          <ChatInput
-            onSendMessage={handleSendMessage}
-            isLoading={isLoading}
-            error={error}
-            isListening={isListening}
-            onVoiceInput={handleVoiceInput}
-            setIsListening={setIsListening}
-            disabled={!!(isAnonymous && trialStatus && (
-              (trialStatus.trialEndTime && new Date() > new Date(trialStatus.trialEndTime)) ||
-              trialStatus.messageCount >= trialStatus.maxMessages
-            ))}
-          />
-          {pendingVoiceMessage && (
-            <div className="absolute bottom-20 left-4 right-4 bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-300 rounded-lg p-3 text-blue-800 shadow-lg">
-              <p className="text-sm font-medium">🎤 Voice message: "{pendingVoiceMessage}"</p>
-              <p className="text-xs opacity-75">Sending in 1 second...</p>
-            </div>
-          )}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-600/30 via-purple-600/20 to-transparent pt-12 pb-6">
+          <div className="max-w-5xl mx-auto px-4">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              isLoading={isLoading}
+              error={error}
+              isListening={isListening}
+              onVoiceInput={handleVoiceInput}
+              setIsListening={setIsListening}
+              disabled={!!(isAnonymous && trialStatus && (
+                (trialStatus.trialEndTime && new Date() > new Date(trialStatus.trialEndTime)) ||
+                trialStatus.messageCount >= trialStatus.maxMessages
+              ))}
+            />
+            {pendingVoiceMessage && (
+              <div className="mt-4 glass rounded-xl p-4 text-white shadow-xl slide-up">
+                <p className="font-medium flex items-center">
+                  <span className="text-xl mr-3 animate-pulse">🎤</span>
+                  Voice message: "{pendingVoiceMessage}"
+                </p>
+                <p className="text-sm opacity-75 mt-1">Sending in 1 second...</p>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Floating Voice Chat Button */}
         <button
-          className="fixed bottom-8 right-8 z-40 w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 text-white flex items-center justify-center shadow-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-110"
+          className="fixed bottom-8 right-8 z-40 w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-violet-600 text-white flex items-center justify-center shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 pulse-glow disabled:opacity-50 disabled:cursor-not-allowed"
           title="Open Voice Chat"
           onClick={() => setShowVoiceChat(true)}
           disabled={!!(isAnonymous && trialStatus && (
@@ -276,7 +312,7 @@ function App() {
             trialStatus.messageCount >= trialStatus.maxMessages
           ))}
         >
-          <Mic size={32} />
+          <Mic size={28} />
         </button>
       </div>
     </div>
