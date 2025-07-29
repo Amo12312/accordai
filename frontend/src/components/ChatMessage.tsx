@@ -77,44 +77,52 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message, isTyping = fa
   }, [displayedContent, isUser, isTyping, hasSpoken, onAssistantSpoken]);
 
   return (
-    <div className={`flex items-start gap-3 mb-6 ${isUser ? 'flex-row-reverse' : ''}`}>
-      <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-md ${
+    <div className={`flex items-start gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6 ${isUser ? 'flex-row-reverse' : ''}`}>
+      <div className={`flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-sm ${
         isUser 
-          ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white' 
-          : 'bg-gradient-to-br from-slate-100 to-slate-200 text-slate-700 border border-slate-300'
+          ? 'bg-gradient-to-br from-purple-500 to-violet-500 text-white' 
+          : 'bg-gradient-to-br from-slate-100 to-white text-slate-600 border border-slate-200'
       }`}>
-        {isUser ? <User size={18} /> : <Bot size={18} />}
+        {isUser ? <User size={12} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px]" /> : <Bot size={12} className="sm:w-4 sm:h-4 md:w-[18px] md:h-[18px]" />}
       </div>
       
-      <div className={`max-w-xs sm:max-w-md lg:max-w-lg xl:max-w-xl ${
+      <div className={`max-w-[240px] xs:max-w-[280px] sm:max-w-md lg:max-w-lg xl:max-w-xl ${
         isUser ? 'text-right' : 'text-left'
       }`}>
-        <div className={`inline-block p-4 rounded-2xl shadow-lg relative ${
+        <div className={`inline-block p-2 sm:p-3 md:p-4 rounded-xl sm:rounded-2xl shadow-sm relative ${
           isUser
-            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-md'
-            : 'bg-white border border-slate-200 text-gray-800 rounded-bl-md shadow-md'
+            ? 'bg-gradient-to-br from-purple-500 to-violet-500 text-white rounded-br-md'
+            : 'bg-white border border-slate-200/50 text-slate-800 rounded-bl-md shadow-sm backdrop-blur-sm'
         }`}>
           {!isUser && isTyping && message.content.length === 0 ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 md:w-2 md:h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 md:w-2 md:h-2 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 md:w-2 md:h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
               </div>
-              <span className="text-sm text-gray-600 ml-2">Accord is thinking</span>
+              <span className="text-xs sm:text-sm text-slate-600 ml-1 sm:ml-2">Accord is reflecting...</span>
             </div>
           ) : (
-            <p className="text-sm leading-relaxed whitespace-pre-wrap">
+            <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">
               {displayedContent}
               {!isUser && isTyping && (
-                <span className="inline-block w-0.5 h-4 bg-blue-500 ml-0.5 animate-pulse"></span>
+                <span className="inline-block w-0.5 h-3 sm:h-4 bg-blue-400 ml-0.5 animate-pulse"></span>
               )}
             </p>
           )}
         </div>
         
-        <div className={`mt-2 text-xs text-gray-500 ${isUser ? 'text-right' : 'text-left'}`}>
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        <div className={`mt-1 sm:mt-2 text-xs text-slate-500 ${isUser ? 'text-right' : 'text-left'}`}>
+          <span className="hidden xs:inline">
+            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+          <span className="xs:hidden">
+            {message.timestamp.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+          </span>
+          {isSpeaking && !isUser && (
+            <span className="ml-1 sm:ml-2 text-purple-400">🔊</span>
+          )}
         </div>
       </div>
     </div>

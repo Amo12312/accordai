@@ -52,22 +52,22 @@ export const TrialBanner: React.FC<TrialBannerProps> = ({
 
   if (isExpired) {
     return (
-      <div className="bg-gradient-to-r from-red-500 to-red-600 text-white p-4 rounded-lg mb-4 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <User className="text-red-100" size={24} />
-            <div>
-              <h3 className="font-semibold">Trial Expired</h3>
-              <p className="text-red-100 text-sm">
-                Sign in to continue chatting with Accord AI
+      <div className="bg-gradient-to-r from-orange-400 to-red-400 text-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl mb-3 sm:mb-4 shadow-soft mx-2 sm:mx-3 md:mx-4">
+        <div className="flex items-center justify-between flex-wrap gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <User className="text-orange-100 flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="min-w-0">
+              <h3 className="font-semibold text-sm sm:text-base">✨ Trial Complete</h3>
+              <p className="text-orange-100 text-xs sm:text-sm">
+                Ready to continue your journey?
               </p>
             </div>
           </div>
           <button
             onClick={onSignInClick}
-            className="bg-white text-red-600 px-4 py-2 rounded-lg font-medium hover:bg-red-50 transition-colors"
+            className="bg-white text-orange-600 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-md sm:rounded-lg font-medium hover:bg-orange-50 transition-colors text-xs sm:text-sm whitespace-nowrap touch-target"
           >
-            Sign In
+            Continue
           </button>
         </div>
       </div>
@@ -75,34 +75,38 @@ export const TrialBanner: React.FC<TrialBannerProps> = ({
   }
 
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-lg mb-4 shadow-lg">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Clock className="text-blue-100" size={20} />
-            <span className="font-medium">{timeLeft}</span>
+    <div className="bg-gradient-to-r from-purple-500 to-violet-500 text-white p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl mb-3 sm:mb-4 shadow-soft mx-2 sm:mx-3 md:mx-4">
+      <div className="flex items-center justify-between flex-wrap gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 md:gap-4 min-w-0 flex-1">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <Clock className="text-purple-100 flex-shrink-0 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+            <span className="font-medium text-xs sm:text-sm md:text-base">{timeLeft}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <MessageSquare className="text-blue-100" size={20} />
-            <span className="font-medium">{remainingMessages} left</span>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <MessageSquare className="text-purple-100 flex-shrink-0 w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+            <span className="font-medium text-xs sm:text-sm md:text-base">{remainingMessages} left</span>
           </div>
         </div>
         <button
           onClick={onSignInClick}
-          className="bg-white text-blue-600 px-4 py-2 rounded-lg font-medium hover:bg-blue-50 transition-colors"
+          className="bg-white text-purple-600 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-md sm:rounded-lg font-medium hover:bg-purple-50 transition-colors text-xs sm:text-sm whitespace-nowrap touch-target"
         >
-          Sign In for Unlimited
+          <span className="hidden sm:inline">Sign In for Unlimited</span>
+          <span className="sm:hidden">Sign In</span>
         </button>
       </div>
-      <div className="mt-2">
-        <div className="w-full bg-blue-400 bg-opacity-30 rounded-full h-2">
+      <div className="mt-2 sm:mt-3">
+        <div className="w-full bg-blue-300 bg-opacity-30 rounded-full h-1.5 sm:h-2">
           <div
-            className="bg-white h-2 rounded-full transition-all duration-300"
+            className="bg-white h-2 rounded-full transition-all duration-500 ease-out"
             style={{
               width: `${Math.max(10, (remainingMessages / trialStatus.maxMessages) * 100)}%`
             }}
           />
         </div>
+        <p className="text-xs text-purple-100 mt-1 text-center">
+          🌱 Your mindful trial experience
+        </p>
       </div>
     </div>
   );

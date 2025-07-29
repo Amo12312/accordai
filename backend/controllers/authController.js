@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const mongoose = require('mongoose');
 
 // Try to use MongoDB User model, fallback to memory store
-let User;
+let User, userStore;
 try {
   User = require('../models/User');
   // Test if MongoDB is connected
@@ -15,6 +15,7 @@ try {
 } catch (error) {
   console.log('📝 Using in-memory user storage (MongoDB not available)');
   User = require('../models/MemoryUser');
+  userStore = require('../models/MemoryUser').userStore;
 }
 
 // JWT Secret
@@ -50,9 +51,13 @@ const verifyToken = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET);
+    console.log('🔍 Token decoded:', { userId: decoded.userId });
+    
     const user = await User.findById(decoded.userId);
+    console.log('🔍 User lookup result:', { found: !!user, userId: decoded.userId });
     
     if (!user) {
+      console.error('❌ User not found for token:', decoded.userId);
       return res.status(401).json({ 
         success: false, 
         message: 'User not found' 
@@ -225,16 +230,35 @@ const googleAuth = async (req, res) => {
         lastActiveTime: new Date()
       };
       
-      user = await User.create ? User.create(userData) : new User(userData).save();
+      console.log('🔍 Creating new user with data:', userData);
+      
+      // Check if using MongoDB User model or MemoryUser model
+      if (User.create) {
+        user = await User.create(userData);
+      } else {
+        // For MemoryUser, use the static create method
+        user = await User.create(userData);
+      }
+      
+      console.log('🔍 Created user:', { id: user._id, email: user.email });
     } else {
       // Update existing user
       user.lastActiveTime = new Date();
       if (!user.googleId) user.googleId = googleId;
       if (!user.photoURL) user.photoURL = photoURL;
-      await user.save();
+      
+      // For MemoryUser, we need to save through the store
+      if (user.save) {
+        await user.save();
+      } else {
+        // Fallback for MemoryUser - save manually
+        await User.save ? User.save(user) : userStore.save(user);
+      }
+      console.log('🔍 Updated existing user:', { id: user._id, email: user.email });
     }
 
     // Generate JWT token
+    console.log('🔍 Generating token for user ID:', user._id);
     const token = generateToken(user._id);
 
     res.status(200).json({

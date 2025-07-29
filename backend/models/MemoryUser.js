@@ -103,4 +103,6 @@ class MockUser {
 
 const userStore = new MemoryUserStore();
 
+// Export both MockUser and userStore
 module.exports = MockUser;
+module.exports.userStore = userStore;
